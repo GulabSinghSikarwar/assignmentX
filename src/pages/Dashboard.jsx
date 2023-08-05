@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import   jsonData from '../assets/data.json'
 // Data
 import mockData from "../assets/data.json";
 import timestamps from "../assets/timeStamps.json";
@@ -21,6 +21,8 @@ const Dashboard = () => {
   const [selectedOrderDetails, setSelectedOrderDetails] = useState({});
   const [selectedOrderTimeStamps, setSelectedOrderTimeStamps] = useState({});
 
+  const [showCard ,setShowCard] =useState(false)
+
   // Merge timestamps data with mockData based on the order ID
   const mergedData = mockData.results.map((order) => {
     const id = order["&id"];
@@ -37,6 +39,34 @@ const Dashboard = () => {
   const filteredData = mergedData.filter((order) =>
     order["&id"].toLowerCase().includes(searchText.toLowerCase())
   );
+
+  const  updateSelectedData =(data,index )=>{
+
+    console.log("index  ", index);
+
+    // console.log("func parent call ");
+    // setSelectedOrderDetails({...data})
+    // console.log(data);
+    const rd = {
+      ...data.executionDetails
+    }
+    console.log(rd);
+    setSelectedOrderDetails({
+...rd
+    })
+
+    // console.log("index : ",index);
+    // console.log(timestamps);
+    const td ={...timestamps.results[index].timestamps}
+    console.log(" td : ",td);
+    setSelectedOrderTimeStamps({...td})
+  }
+  useEffect(()=>{
+    console.log(jsonData);
+    
+
+  }
+  ,[])
 
 
   return (
@@ -56,7 +86,7 @@ const Dashboard = () => {
         </div>
       </div>
       <div className={styles.content}>
-        <div className={styles.section}>
+        <div  className={styles.section}>
           <Card
             cardData={selectedOrderDetails}
             title="Selected Order Details"
@@ -67,7 +97,7 @@ const Dashboard = () => {
           />
         </div>
         {/* Use filteredData instead of mergedData */}
-        <List rows={filteredData} selectedCurrency={currency} />
+        <List  updateSelectedData={updateSelectedData}  rows={filteredData} selectedCurrency={currency} />
       </div>
     </div>
   );

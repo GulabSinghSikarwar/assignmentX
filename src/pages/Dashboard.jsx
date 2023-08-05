@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 // Data
@@ -20,10 +21,28 @@ const Dashboard = () => {
   const [selectedOrderDetails, setSelectedOrderDetails] = useState({});
   const [selectedOrderTimeStamps, setSelectedOrderTimeStamps] = useState({});
 
+  // Merge timestamps data with mockData based on the order ID
+  const mergedData = mockData.results.map((order) => {
+    const id = order["&id"];
+    const matchingTimeStamp = timestamps.results.find(
+      (timestamp) => timestamp["&id"] === id
+    );
+    return {
+      ...order,
+      orderSubmitted: matchingTimeStamp?.timestamps?.orderSubmitted || "",
+    };
+  });
+
+  // Filter orders based on search text
+  const filteredData = mergedData.filter((order) =>
+    order["&id"].toLowerCase().includes(searchText.toLowerCase())
+  );
+
+
   return (
     <div>
       <div className={styles.header}>
-        <HeaderTitle primaryTitle="Orders" secondaryTitle="5 orders" />
+        <HeaderTitle primaryTitle="Orders" secondaryTitle={`${filteredData.length} orders`} />
         <div className={styles.actionBox}>
           <Search
             value={searchText}
@@ -47,7 +66,8 @@ const Dashboard = () => {
             title="Selected Order Timestamps"
           />
         </div>
-        <List rows={mockData.results} />
+        {/* Use filteredData instead of mergedData */}
+        <List rows={filteredData} selectedCurrency={currency} />
       </div>
     </div>
   );
